@@ -1,10 +1,12 @@
-package org.example.dpostnov;
+package org.example.dpostnov.controller;
 
 import lombok.NonNull;
 import lombok.val;
 import org.example.dpostnov.domain.Message;
+import org.example.dpostnov.domain.User;
 import org.example.dpostnov.repos.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,33 +15,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 
 @Controller
-public class GreetingController {
+public class MainController {
     @Autowired
     MessageRepo messageRepo;
 
-    @GetMapping("/greeting")
-    public String greeting(
-            @RequestParam(name="name", required = false, defaultValue = "world") String name,
-            Map<String, Object> model
-    ){
-        model.put("name", name);
+    @GetMapping("/")
+    public String greeting(){
         return "greeting";
     }
 
-    @GetMapping
+    @GetMapping("/main")
     public String main(Map<String, Object> model){
         val messages = messageRepo.findAll();
         model.put("messages", messages);
         return "main";
     }
 
-    @PostMapping
+    @PostMapping("main")
     public String add(
+            @AuthenticationPrincipal User user,
             @NonNull @RequestParam String text,
             @NonNull @RequestParam String tag,
             Map<String, Object> model
     ){
-        Message message = new Message(text, tag);
+        Message message = new Message(text, tag, user);
         messageRepo.save(message);
         val messages = messageRepo.findAll();
         model.put("messages", messages);

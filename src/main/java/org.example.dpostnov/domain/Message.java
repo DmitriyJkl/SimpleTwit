@@ -2,15 +2,12 @@ package org.example.dpostnov.domain;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor()
+@RequiredArgsConstructor
 public class Message {
 
     @Id
@@ -24,5 +21,19 @@ public class Message {
     @NonNull
     private String tag;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="user_id")
+    @Setter
+    private User author;
+
+    public Message(String text, String tag, User user) {
+        this.text = text;
+        this.tag = tag;
+        this.author = user;
+    }
+
+    public String getAuthorName() {
+        return author == null?"<none>":author.getUsername();
+    }
 
 }
